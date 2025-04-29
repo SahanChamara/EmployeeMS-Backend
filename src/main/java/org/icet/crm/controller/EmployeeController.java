@@ -1,8 +1,10 @@
 package org.icet.crm.controller;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.icet.crm.dto.Employee;
+import org.icet.crm.service.EmployeeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +16,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EmployeeController {
 
+    private final EmployeeService employeeService;
+
     @PostMapping("/employees")
-    public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee){
-        return null;
+    public ResponseEntity<Employee> addEmployee(@Valid @RequestBody Employee employee){
+        Employee savedEmployee = employeeService.createEmployee(employee);
+        return savedEmployee != null ? ResponseEntity.ok(savedEmployee) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/employees")

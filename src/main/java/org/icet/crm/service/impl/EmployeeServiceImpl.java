@@ -2,16 +2,30 @@ package org.icet.crm.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.icet.crm.dto.Employee;
+import org.icet.crm.entity.EmployeeEntity;
+import org.icet.crm.repository.EmployeeRepository;
 import org.icet.crm.service.EmployeeService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
+
+    private final EmployeeRepository employeeRepository;
+    private final ModelMapper mapper;
+
     @Override
     public Employee createEmployee(Employee employee) {
+        if (employee != null) {
+            if(employeeRepository.existsByEmail(employee.getEmail())){
+                throw new IllegalArgumentException("User Already Exist");
+            }
+            return mapper.map(employeeRepository.save(mapper.map(employee, EmployeeEntity.class)), Employee.class);
+        }
         return null;
     }
 
