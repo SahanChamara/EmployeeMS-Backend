@@ -23,11 +23,12 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @PostMapping("/employees")
-    public ResponseEntity<?> addEmployee(@Valid @RequestBody Employee employee, BindingResult bindingResult){
+    public ResponseEntity<?> addEmployee(@Valid @RequestBody Employee employee, BindingResult bindingResult) {
 
-        if(bindingResult.hasErrors()){
-            Map<String, String> errors =  new HashMap<>();
-            bindingResult.getFieldErrors().forEach( err -> errors.put(err.getField(), err.getDefaultMessage()));
+        // This is handle the email validation
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
             return ResponseEntity.badRequest().body(errors);
         }
 
@@ -35,14 +36,14 @@ public class EmployeeController {
             Employee savedEmployee = employeeService.createEmployee(employee);
             return savedEmployee != null ? ResponseEntity.ok(savedEmployee) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (IllegalArgumentException e) {
-           Map<String, String> error = new HashMap<>();
-           error.put("Email Already Exist", e.getMessage());
-           return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+            Map<String, String> error = new HashMap<>();
+            error.put("Email Already Exist", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
         }
     }
 
     @GetMapping("/employees")
-    public ResponseEntity<List<Employee>> getAllEmployees(){
+    public ResponseEntity<List<Employee>> getAllEmployees() {
         List<Employee> allEmployees = employeeService.getAllEmployees();
         return allEmployees.isEmpty()
                 ? ResponseEntity.notFound().build()
@@ -50,12 +51,29 @@ public class EmployeeController {
     }
 
     @PutMapping("/employees/{empId}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable Long empId, @RequestBody Employee employee){
-        return null;
+    public ResponseEntity<?> updateEmployee(@PathVariable Long empId, @Valid @RequestBody Employee employee, BindingResult bindingResult) {
+
+        // This is handle the email validation
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        try {
+            Employee savedEmployee = employeeService.updateEmployee(empId, employee);
+            return savedEmployee != null ? ResponseEntity.ok(savedEmployee) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("Email Already Exist", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        }
     }
 
     @DeleteMapping("/employees/{empId}")
-    public ResponseEntity<?> deleteEmployee(@PathVariable Long empId){
-        return null;
+    public ResponseEntity<Boolean> deleteEmployee(@PathVariable Long empId) {
+        Boolean existEmployee = employeeService.deleteEmployee(empId);
+        if(Boolean.TRUE.equals(existEmployee)) return ResponseEntity.status(HttpStatus.OK).body(true);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false);
     }
 }

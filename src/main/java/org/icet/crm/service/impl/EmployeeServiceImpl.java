@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.parser.Entity;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,7 +23,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee createEmployee(Employee employee) {
         if (employee != null) {
-            if(employeeRepository.existsByEmail(employee.getEmail())){
+            if (Boolean.TRUE.equals(employeeRepository.existsByEmail(employee.getEmail()))) {
                 throw new IllegalArgumentException("User Already Exist");
             }
             return mapper.map(employeeRepository.save(mapper.map(employee, EmployeeEntity.class)), Employee.class);
@@ -32,8 +33,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee updateEmployee(Long empId, Employee employee) {
-        return null;
+        Optional<EmployeeEntity> existEmployee = employeeRepository.findById(empId);
+        if(existEmployee.isPresent() && !existEmployee.get().getId().equals(empId)){
+            throw new IllegalArgumentException("Email Already in use by Another User");
+        }
+        return mapper.map(employeeRepository.save(mapper.map(employee, EmployeeEntity.class)), Employee.class);
     }
+
 
     @Override
     public List<Employee> getAllEmployees() {
@@ -45,6 +51,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Boolean deleteEmployee(Long empId) {
-        return null;
+        Optional<EmployeeEntity> existEmployee = employeeRepository.findById(empId);
+        if(existEmployee.isPresent()){
+            employeeRepository.deleteById(empId);
+            return true;
+        }
+        return false;
     }
 }
