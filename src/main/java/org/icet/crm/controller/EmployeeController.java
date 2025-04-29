@@ -5,10 +5,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.icet.crm.dto.Employee;
 import org.icet.crm.service.EmployeeService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -19,9 +23,22 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @PostMapping("/employees")
-    public ResponseEntity<Employee> addEmployee(@Valid @RequestBody Employee employee){
-        Employee savedEmployee = employeeService.createEmployee(employee);
-        return savedEmployee != null ? ResponseEntity.ok(savedEmployee) : ResponseEntity.notFound().build();
+    public ResponseEntity<?> addEmployee(@Valid @RequestBody Employee employee, BindingResult bindingResult){
+
+        if(bindingResult.hasErrors()){
+            Map<String, String> errors =  new HashMap<>();
+            bindingResult.getFieldErrors().forEach( err -> errors.put(err.getField(), err.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        try {
+            Employee savedEmployee = employeeService.createEmployee(employee);
+            return savedEmployee != null ? ResponseEntity.ok(savedEmployee) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (IllegalArgumentException e) {
+           Map<String, String> error = new HashMap<>();
+           error.put("Email Already Exist", e.getMessage());
+           return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        }
     }
 
     @GetMapping("/employees")

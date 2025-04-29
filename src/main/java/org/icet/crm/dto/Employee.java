@@ -23,7 +23,7 @@ public class Employee {
     @Size(min = 2, max = 100, message = "user name should have at least 2 characters")
     private String name;
 
-    @Email
+    @Email(message = "Email should be valid")
     @NotEmpty
     private String email;
 
