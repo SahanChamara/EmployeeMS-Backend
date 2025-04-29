@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.icet.crm.util.DepartmentType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,12 +24,10 @@ public class Employee {
     private String name;
 
     @Email
-    @UniqueElements
     @NotEmpty
     private String email;
 
-    @NotBlank
-    private String  department;
+    private DepartmentType department;
     private LocalDateTime createAt;
     private LocalDateTime updatedAt;
 }

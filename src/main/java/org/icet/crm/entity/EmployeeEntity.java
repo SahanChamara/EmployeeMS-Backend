@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.icet.crm.util.DepartmentType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,11 +31,11 @@ public class EmployeeEntity {
     private String name;
 
     @Email
-    @UniqueElements
     private String email;
 
-    @NotBlank
-    private String  department;
+
+    @Enumerated(EnumType.STRING)
+    private DepartmentType department;
 
     @CreationTimestamp
     private LocalDateTime createAt;
