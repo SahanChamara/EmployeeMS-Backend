@@ -33,10 +33,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee updateEmployee(Long empId, Employee employee) {
-        Optional<EmployeeEntity> existEmployee = employeeRepository.findById(empId);
+/*        Optional<EmployeeEntity> existEmployee = employeeRepository.findById(empId);
         if(existEmployee.isPresent() && !existEmployee.get().getId().equals(empId)){
             throw new IllegalArgumentException("Email Already in use by Another User");
-        }
+        }*/
         return mapper.map(employeeRepository.save(mapper.map(employee, EmployeeEntity.class)), Employee.class);
     }
 
@@ -57,5 +57,10 @@ public class EmployeeServiceImpl implements EmployeeService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Employee getEmployeeById(Long id) {
+        return mapper.map(employeeRepository.findById(id), Employee.class);
     }
 }
