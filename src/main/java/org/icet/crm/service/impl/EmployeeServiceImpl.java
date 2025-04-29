@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.parser.Entity;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<Employee> getAllEmployees() {
-        return List.of();
+        return employeeRepository.findAll()
+                .stream()
+                .map(employeeEntity -> mapper.map(employeeEntity, Employee.class))
+                .toList();
     }
 
     @Override

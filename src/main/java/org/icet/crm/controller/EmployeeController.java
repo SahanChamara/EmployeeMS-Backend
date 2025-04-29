@@ -43,7 +43,10 @@ public class EmployeeController {
 
     @GetMapping("/employees")
     public ResponseEntity<List<Employee>> getAllEmployees(){
-        return  null;
+        List<Employee> allEmployees = employeeService.getAllEmployees();
+        return allEmployees.isEmpty()
+                ? ResponseEntity.notFound().build()
+                : ResponseEntity.ok(allEmployees);
     }
 
     @PutMapping("/employees/{empId}")
